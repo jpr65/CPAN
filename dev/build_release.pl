@@ -41,7 +41,6 @@ my $dest_dir = npar -dest    => ExistingDir => \%arg_opts;
 p_end \%arg_opts;
 
 my $source_dir    = par source_dir    => ExistingDir  => $module;
-my $manifest_file = par manifest_file => ExistingFile => "$source_dir/MANIFEST";
 
 return undef if validation_trouble($trouble_level);
     
@@ -68,7 +67,15 @@ sub read_file {
 
 # --- MAIN -----------------------------------------------
 
-$dest_dir .= "/$module";
+chdir $source_dir;
+
+my $manifest_file = par manifest_file => ExistingFile => "MANIFEST";
+
+my $dirs_up = $source_dir;
+
+$dirs_up =~ s/[^\/]+/../og;
+
+$dest_dir = "$dirs_up/$dest_dir/$module";
 mkdir $dest_dir;
 
 my $release_file = "$dest_dir/$module-$version.tgz";
