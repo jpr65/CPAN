@@ -78,7 +78,7 @@ $dirs_up =~ s/[^\/]+/../og;
 $dest_dir = "$dirs_up/$dest_dir/$module";
 mkdir $dest_dir;
 
-my $release_file = "$dest_dir/$module-$version.tgz";
+my $release_file = "$dest_dir/$module-$version.tar";
 
 msg "read manifest ...";
 
@@ -88,11 +88,24 @@ msg "packing files ...";
 
 say join("\n", @files);
 
+msg "build release file ...";
+
 my $tar = Archive::Tar->new;
 $tar->add_files(@files);
+
+$tar->write($release_file);
+
+# $tar = Archive::Tar->new;
+# $tar->add_files($release_file);
+
+# my $file_to_delete = $release_file;
+
+# $release_file .= ".gz";
 
 msg "write dest file as $release_file";
 
 $tar->write($release_file);
 
+# unlink $file_to_delete;
+    
 msg "Done."
