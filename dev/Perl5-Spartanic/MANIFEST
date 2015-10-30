@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Perl5-Spartanic.t
+lib/Perl5/Spartanic.pm

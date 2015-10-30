@@ -1,0 +1,28 @@
+Perl5-Spartanic version 0.110
+=============================
+
+This module does not implement any functions, read in the documentation, why.
+
+INSTALLATION
+
+To install this module just copy it into your lib path 
+
+or type the following if build environment is available:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires NO other modules and libraries.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 by Ralf Peine
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.1 or,
+at your option, any later version of Perl 5 you may have available.
+
