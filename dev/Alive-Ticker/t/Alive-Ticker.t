@@ -1,5 +1,5 @@
 # Before 'make install' is performed this script should be runnable with
-# 'make test'. After 'make install' it should work as 'perl Alive.t'
+# 'make test'. After 'make install' it should work as 'perl Alive-Ticker.t'
 
 #########################
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Alive qw(:all);
+use Alive::Ticker qw(:all);
 
 sub _say { print join (' ', @_) . "\n"; }
 
@@ -19,7 +19,7 @@ is (tacks, 1, "first tack");
 
 print '# ';
 
-Alive::setup(-name => '#');
+Alive::Ticker::setup(-name => '#');
 
 foreach my $i (1..2000) {
     tack;
@@ -33,7 +33,7 @@ $tick->();
 
 is (tacks, 2003, "first tick");
 
-my $tc = Alive::get_tack_counter();
+my $tc = Alive::Ticker::get_tack_counter();
 
 is ($$tc, 2003, "get_tack_counter()");
 
@@ -43,7 +43,7 @@ is ($$tc, 2004, "tack_counter++");
 
 my $tick_2_count = 0;
 
-my $tick_2 = Alive::create(-factor       => 2,
+my $tick_2 = Alive::Ticker::create(-factor       => 2,
                            -name         => '@',
                            -smaller_char => '*',
                            -bigger_char  => '&',
@@ -57,7 +57,7 @@ foreach my $i (1..200) {
 
 is ($tick_2_count, 200, "own tick counter");
 
-Alive::silent();
+Alive::Ticker::silent();
 
 foreach my $i (1..200) {
     tack;
@@ -66,7 +66,7 @@ foreach my $i (1..200) {
 
 is ($tick_2_count, 400, "silent() but counting ticks");
 
-Alive::all_off();
+Alive::Ticker::all_off();
 
 foreach my $i (1..200) {
     tack;
@@ -77,7 +77,7 @@ is ($tick_2_count, 400, "all_off() without counting ticks");
 
 print "# ";
 
-Alive::on();
+Alive::Ticker::on();
 
 foreach my $i (1..200) {
     tack;

@@ -4,7 +4,7 @@
 #
 #      Build release tar file for cpan upload
 #
-# Ralf Peine, 30.10.2015, 07:00
+# Ralf Peine, 31.10.2015, 08:00
 #
 #==============================================================================
 #  /^\s*sub\s+(\w+)/
@@ -67,22 +67,19 @@ sub read_file {
 
 # --- MAIN -----------------------------------------------
 
-chdir $source_dir;
+my $manifest_file = par manifest_file => ExistingFile => "$source_dir/MANIFEST";
 
-my $manifest_file = par manifest_file => ExistingFile => "MANIFEST";
-
-my $dirs_up = $source_dir;
-
-$dirs_up =~ s/[^\/]+/../og;
-
-$dest_dir = "$dirs_up/$dest_dir/$module";
+$dest_dir .= "/$module";
 mkdir $dest_dir;
+
+say "# ===========================================================================";
+say "# Build release $version of $module and store in $dest_dir";
 
 my $release_file = "$dest_dir/$module-$version.tar";
 
 msg "read manifest ...";
 
-my @files = read_file($manifest_file);
+my @files = map { "$source_dir/$_" } read_file($manifest_file);
 
 msg "packing files ...";
 
@@ -95,17 +92,10 @@ $tar->add_files(@files);
 
 $tar->write($release_file);
 
-# $tar = Archive::Tar->new;
-# $tar->add_files($release_file);
-
-# my $file_to_delete = $release_file;
-
-# $release_file .= ".gz";
-
-msg "write dest file as $release_file";
+msg "write dest file as $release_file.gz";
 
 $tar->write($release_file);
 
-# unlink $file_to_delete;
+system ("gzip $release_file");
     
 msg "Done."

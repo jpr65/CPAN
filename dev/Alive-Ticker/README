@@ -1,0 +1,35 @@
+Alive-Ticker version 0.01
+==================
+
+INSTALLATION
+
+To install this module
+
+if cpan shell is available, type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+else
+
+   just copy it into some directory.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2015 by Ralf Peine
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,6 +1,6 @@
 #==============================================================================
 #
-#  Alive Tick-Tack (German baby-word for clock)
+#  Alive::Ticker - Tick-Tack (German baby-word for clock)
 #
 #  to show perl is still alive and working during long time runnings
 #  prints out chars every n-th call 
@@ -9,7 +9,7 @@
 #
 #==============================================================================
 
-package Alive;
+package Alive::Ticker;
 
 use strict;
 use warnings;
@@ -143,17 +143,17 @@ __END__
 
 =head1 NAME
 
-Alive - Ticker to show perl is still alive and working during long time runnings
+Alive::Ticker - to show perl is still alive and working during long time runnings
 
 =head1 VERSION
 
-This documentation refers to version 0.100 of Alive
+This documentation refers to version 0.100 of Alive::Ticker
 
 =head1 SYNOPSIS
 
 Shortest
 
-  use Alive qw(tack);
+  use Alive::Ticker qw(tack);
   
   foreach my $i (1..10000) {
       tack;
@@ -161,7 +161,7 @@ Shortest
 
 or fastest
 
-  use Alive qw(tack);
+  use Alive::Ticker qw(tack);
 
   my $tick = tack;
   
@@ -171,7 +171,7 @@ or fastest
 
 or individual
 
-  my $tick = Alive::create(
+  my $tick = Alive::Ticker::create(
       -smaller      => 10,
       -bigger       => 100,
       -newline      => 500,
@@ -186,12 +186,12 @@ or individual
 
 =head1 DESCRIPTION
 
-Alive does inform the user that perl job or script is still running by printing to console.
+Alive::Ticker does inform the user that perl job or script is still running by printing to console.
 
 The following script
 
   $| = 1;
-  use Alive qw(:all);
+  use Alive::Ticker qw(:all);
   
   foreach my $i (1..2000) {
       tack;
@@ -209,12 +209,12 @@ prints out this
 
 =head3 new() does not exist
 
-There is no new(), use create() instead. Reason is, that there are no instances of Alive
+There is no new(), use create() instead. Reason is, that there are no instances of Alive::Ticker
 that could be created.
 
 =head3 create()
 
-Alive::create() creates a tick closure (a reference to a anonymous sub) for comfort
+Alive::Ticker::create() creates a tick closure (a reference to a anonymous sub) for comfort
 and fast calling without method name search and without args. The counter is inside.
 
 Using instances is much more work to implement, slower and not so flexible.
@@ -258,9 +258,9 @@ returns a reference to the counter variable used by tack for fast access.
 
 There are 3 running modes that can be selected:
 
-  Alive::on();        # default
-  Alive::silent();
-  Alive::all_off();
+  Alive::Ticker::on();        # default
+  Alive::Ticker::silent();
+  Alive::Ticker::all_off();
 
 =head3 on()
 
@@ -282,16 +282,16 @@ prints out nothing, but does the counting.
 
 If you need speed up, use
 
-  Alive::all_off();
+  Alive::Ticker::all_off();
 
 Now nothing is printed or counted by all ticks.
 Selecting this mode gives you maximum speed without removing $tick->() calls.
   
-  my $tick = Alive::create();
+  my $tick = Alive::Ticker::create();
   
-  Alive::all_off();
+  Alive::Ticker::all_off();
 
-  my $tick_never = Alive::create();
+  my $tick_never = Alive::Ticker::create();
   
 call of $tick->(); prints out nothing and does not count.
 
@@ -301,7 +301,7 @@ $tick_never has an empty sub which is same as
 
 This $tick_never will also not print out anything, if
 
-  Alive::on();
+  Alive::Ticker::on();
   
 is called to enable ticking.
 
@@ -313,10 +313,10 @@ given filter. So you can see, if database select is still running or halted.
 But start ticking not before more than 40000 rows processed. So don't
 log out for small selections.
 
-  use Alive;
+  use Alive::Ticker;
   
   # Ticks all fetched rows
-  my $tick1 = Alive::create(
+  my $tick1 = Alive::Ticker::create(
       -factor => 100,
       -name   => '   S',
   );
@@ -324,7 +324,7 @@ log out for small selections.
   my $matches = 0;
 
   # To tick rows selected by filter
-  my $tick2 = Alive::create(
+  my $tick2 = Alive::Ticker::create(
       -factor       => 10,
       -smaller_char => '+',
       -bigger_char  => '#',
@@ -332,7 +332,7 @@ log out for small selections.
       -counter_ref  => \$matches,
   );
 
-  Alive::silent();
+  Alive::Ticker::silent();
 
   my @filtered_rows;
 
@@ -345,7 +345,7 @@ log out for small selections.
           $tick2->();
       }
       
-      Alive::on() if $i == 40000;
+      Alive::Ticker::on() if $i == 40000;
   }
   
   say qq();
