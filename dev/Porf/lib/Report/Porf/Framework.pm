@@ -6,12 +6,12 @@
 #
 # Framework to create/configure Reports for any output format.
 #
-# Ralf Peine, Tue May 27 11:30:17 2014
+# Ralf Peine, Sun Dec 13 08:55:33 2020
 #
 # More documentation at the end of file
 #------------------------------------------------------------------------------
 
-$VERSION = "2.001";
+$VERSION = "2.010";
 
 #------------------------------------------------------------------------------
 #
@@ -90,45 +90,45 @@ sub _new
 
 # --- CreateInstance --------------------------------------
 sub create {
-	my %options = @_ if scalar @_;
+        my %options = @_ if scalar @_;
 
-	my $framework = Report::Porf::Framework->_new();
-	$framework->use_default_configurator_creators();
+        my $framework = Report::Porf::Framework->_new();
+        $framework->use_default_configurator_creators();
 
-	$framework->set_name($options{-name}) if $options{-name};
-	$framework->set_description($options{-description}) if $options{-description};
-	$framework->set_default_format('text');
-	$framework->set_max_rows(10);
+        $framework->set_name($options{-name}) if $options{-name};
+        $framework->set_description($options{-description}) if $options{-description};
+        $framework->set_default_format('text');
+        $framework->set_max_rows(10);
 
-	foreach my $key (sort(keys(%options))) {
-	    if ($key =~ /^\-create(\w+)ConfiguratorAction$/) {
-			my $format = $1;
-			$framework->set_configurator_action($format => $options{$key});
-	    }
-	}
+        foreach my $key (sort(keys(%options))) {
+            if ($key =~ /^\-create(\w+)ConfiguratorAction$/) {
+                        my $format = $1;
+                        $framework->set_configurator_action($format => $options{$key});
+            }
+        }
 
-	$framework->store();
+        $framework->store();
 
-	return $framework;
+        return $framework;
 }
 
 # --- Activate the default configurators for every known output format -------------
 sub use_default_configurator_creators {
-	my ($self,					# instance_ref
-	) = @_;
+        my ($self,                                      # instance_ref
+        ) = @_;
 
-	$self->set_configurator_action(HTML => sub {
-		my $configurator = Report::Porf::Table::Simple::HtmlReportConfigurator->new();
-		$configurator->set_alternate_row_colors('#DDDDDD', '#FFFFFF');
-		return $configurator;
-	});
-	$self->set_configurator_action
-	    (Text => sub { return Report::Porf::Table::Simple::TextReportConfigurator->new();});
-	$self->set_configurator_action
-	    (CSV => sub { return Report::Porf::Table::Simple::CsvReportConfigurator->new();});
-	
-	$self->set_auto_configurator_action(
-		sub {return Report::Porf::Table::Simple::AutoColumnConfigurator->new();});
+        $self->set_configurator_action(HTML => sub {
+                my $configurator = Report::Porf::Table::Simple::HtmlReportConfigurator->new();
+                $configurator->set_alternate_row_colors('#DDDDDD', '#FFFFFF');
+                return $configurator;
+        });
+        $self->set_configurator_action
+            (Text => sub { return Report::Porf::Table::Simple::TextReportConfigurator->new();});
+        $self->set_configurator_action
+            (CSV => sub { return Report::Porf::Table::Simple::CsvReportConfigurator->new();});
+        
+        $self->set_auto_configurator_action(
+                sub {return Report::Porf::Table::Simple::AutoColumnConfigurator->new();});
 }
 
 #--------------------------------------------------------------------------------
@@ -140,117 +140,117 @@ sub use_default_configurator_creators {
 # --- Name ----------------------------------------------------------------------------
 
 sub set_name {
-	my ($self,					# instance_ref
-		$value					# value to set
-	) = @_;
+        my ($self,                                      # instance_ref
+                $value                                  # value to set
+        ) = @_;
 
-	if ($self->{Name}) {
-		if ($self->{Name} ne $value) {
-			die "Name of framework cannot be changed!";
-		}
-	}
-	$self->{Name} = $value;
+        if ($self->{Name}) {
+                if ($self->{Name} ne $value) {
+                        die "Name of framework cannot be changed!";
+                }
+        }
+        $self->{Name} = $value;
 }
 
 sub get_name {
-	my ($self,					# instance_ref
-	) = @_;
+        my ($self,                                      # instance_ref
+        ) = @_;
         
-	return $self->{Name};
+        return $self->{Name};
 }
 
 # --- Description ----------------------------------------------------------------------------
 
 sub set_description {
-	my ($self,					# instance_ref
-		$value					# value to set
-	) = @_;
+        my ($self,                                      # instance_ref
+                $value                                  # value to set
+        ) = @_;
 
-	$self->{Description} = $value;
+        $self->{Description} = $value;
 }
 
 sub get_description {
-	my ($self,					# instance_ref
-	) = @_;
+        my ($self,                                      # instance_ref
+        ) = @_;
         
-	return $self->{Description};
+        return $self->{Description};
 }
 
 # --- Default Format ----------------------------------------------------------------------------
 
 sub set_default_format {
-	my ($self,					# instance_ref
-		$value					# value to set
-	) = @_;
+        my ($self,                                      # instance_ref
+                $value                                  # value to set
+        ) = @_;
 
-	$self->{DefaultFormat} = $value;
+        $self->{DefaultFormat} = $value;
 }
 
 sub get_default_format {
-	my ($self,					# instance_ref
-	) = @_;
+        my ($self,                                      # instance_ref
+        ) = @_;
         
-	return $self->{DefaultFormat};
+        return $self->{DefaultFormat};
 }
 
 # --- MaxRows ----------------------------------------------------------------------------
 
 sub set_max_rows {
-	my ($self,					# instance_ref
-		$value					# value to set
-	) = @_;
+        my ($self,                                      # instance_ref
+                $value                                  # value to set
+        ) = @_;
 
-	$self->{MaxRows} = $value;
+        $self->{MaxRows} = $value;
 }
 
 sub get_max_rows {
-	my ($self,					# instance_ref
-	) = @_;
+        my ($self,                                      # instance_ref
+        ) = @_;
         
-	return $self->{MaxRows};
+        return $self->{MaxRows};
 }
 
 # --- Configurator ---------------------------------------------------------------
 
 sub set_configurator_action {
-	my ($self,					# instance_ref
-		$format,				# (html/text/csv)
-		$action					# value to set
-	) = @_;
+        my ($self,                                      # instance_ref
+                $format,                                # (html/text/csv)
+                $action                                 # value to set
+        ) = @_;
         
-	die "Format not set" unless $format;
-	die "No action given" unless ref ($action) eq 'CODE';
+        die "Format not set" unless $format;
+        die "No action given" unless ref ($action) eq 'CODE';
 
-	$self->{Configurators}->{lc($format)} = $action;
+        $self->{Configurators}->{lc($format)} = $action;
 }
 
 sub get_configurator_action {
-	my ($self,					# instance_ref
-		$format,				# (html/text/csv)
-	) = @_;
+        my ($self,                                      # instance_ref
+                $format,                                # (html/text/csv)
+        ) = @_;
         
-	die "Format not set" unless $format;
+        die "Format not set" unless $format;
 
-	return $self->{Configurators}->{lc($format)};
+        return $self->{Configurators}->{lc($format)};
 }
 
 # --- AutoConfigurator ---------------------------------------------------------------
 
 sub set_auto_configurator_action {
-	my ($self,					# instance_ref
-		$action					# value to set
-	) = @_;
+        my ($self,                                      # instance_ref
+                $action                                 # value to set
+        ) = @_;
         
-	die "No action given" unless ref ($action) eq 'CODE';
+        die "No action given" unless ref ($action) eq 'CODE';
 
-	$self->{AutoConfigurator} = $action;
+        $self->{AutoConfigurator} = $action;
 }
 
 sub get_auto_configurator_action {
-	my ($self,					# instance_ref
-	) = @_;
+        my ($self,                                      # instance_ref
+        ) = @_;
         
-	return $self->{AutoConfigurator};
+        return $self->{AutoConfigurator};
 }
 
 #--------------------------------------------------------------------------------
@@ -261,99 +261,99 @@ sub get_auto_configurator_action {
 
 # --- get framework --- Creates default, if not existing ------------------------
 sub get {
-	my ($name					# Optional: name of framework
-	) = @_;
+        my ($name                                       # Optional: name of framework
+        ) = @_;
 
-	my $framework;
+        my $framework;
 
-	$name = $DefaultFramework unless $name;
+        $name = $DefaultFramework unless $name;
 
-	unless ($name) {
-		$name = '-default';
-		$framework = $store{$name};
-		$framework = create(
-			-name        => $name,
-			-description => 'Automatic created default framework')
-			->store()
-				unless $framework;
-	}
+        unless ($name) {
+                $name = '-default';
+                $framework = $store{$name};
+                $framework = create(
+                        -name        => $name,
+                        -description => 'Automatic created default framework')
+                        ->store()
+                                unless $framework;
+        }
 
-	$framework = $store{$name};
+        $framework = $store{$name};
 
-	confess "No report framework with name '$name' stored"
-		unless $framework;
+        confess "No report framework with name '$name' stored"
+                unless $framework;
 
-	return $framework;
+        return $framework;
 }
 
 # --- store Framework in internal %store ------------------------------------------
 
 sub store {
-	my ($self,					# instance_ref
-	) = @_;
+        my ($self,                                      # instance_ref
+        ) = @_;
 
-	my $name = $self->get_name();
+        my $name = $self->get_name();
         
-	confess "cannot store unnamed framework" unless $name;
+        confess "cannot store unnamed framework" unless $name;
 
-	$store{$name} = $self;
+        $store{$name} = $self;
 }
 
 # --- Define the default framework to use --------------------------------------------------
 sub set_default_framework {
-	my ($name,					# instance_ref
-	) = @_;
+        my ($name,                                      # instance_ref
+        ) = @_;
 
-	get($name);					# dies if not existing 
-	my $old = $DefaultFramework;
-	$DefaultFramework = $name;
+        get($name);                                     # dies if not existing 
+        my $old = $DefaultFramework;
+        $DefaultFramework = $name;
 
-	return $old;
+        return $old;
 }
 
 # --- create Report Configurator --------------------------------------------------
 
 sub create_report_configurator {
-	my ($self,					# instance_ref
-		$format					# format of report
-	) = @_;
+        my ($self,                                      # instance_ref
+                $format                                 # format of report
+        ) = @_;
 
-	my $action = $self->get_configurator_action(lc($format));
+        my $action = $self->get_configurator_action(lc($format));
 
-	die "don't know how to configure report for format '$format'"
-	    unless $action;
+        die "don't know how to configure report for format '$format'"
+            unless $action;
 
-	return $action->();
+        return $action->();
 }
 
 # --- create Report ---------------------------------------------------------------
 
 sub create_report {
-	my ($self,					# instance_ref
-		$format					# format of report
-	) = @_;
+        my ($self,                                      # instance_ref
+                $format                                 # format of report
+        ) = @_;
 
-	$format = $self->set_default_format('text') unless $format;
+        $format = $self->set_default_format('text') unless $format;
 
-	my $report_configurator = $self->create_report_configurator($format);
-	return $report_configurator->create_and_configure_report();
+        my $report_configurator = $self->create_report_configurator($format);
+        return $report_configurator->create_and_configure_report();
 }
 
 # --- extract format out of file name, if $file is an file name ---------------
 sub extract_format_of_filename {
-	my ($self,					# instance_ref
-		$file_name				# format of report
-	) = @_;
+        my ($self,                                      # instance_ref
+                $file_name                              # format of report
+        ) = @_;
 
-	my $format = '';
+        my $format = '';
 
-	if ($file_name && ref($file_name) eq '') {
-		return 'Text' if $file_name =~ /\.(txt|text)$/io;
-		return 'Html' if $file_name =~ /\.(htm|html)$/io;
-		return 'Csv'  if $file_name =~ /\.csv$/io;
-	}
+        if ($file_name && ref($file_name) eq '') {
+                return 'Text' if $file_name =~ /\.(txt|text)$/io;
+                return 'Html' if $file_name =~ /\.(htm|html)$/io;
+                return 'Csv'  if $file_name =~ /\.csv$/io;
+        }
 
-	return '';
+        return '';
 }
 
 
@@ -362,7 +362,7 @@ sub create_auto_report_configuration {
     my $report_framework = Report::Porf::Framework::get();
     my $configurator     = $report_framework->get_auto_configurator_action()->();
 
-	return $configurator->create_report_configuration(@_);
+        return $configurator->create_report_configuration(@_);
 }
 
 # --- create auto report configuration -----------------------------------------------------------------
@@ -370,68 +370,85 @@ sub report_configuration_as_string {
     my $report_framework = Report::Porf::Framework::get();
     my $configurator     = $report_framework->get_auto_configurator_action()->();
 
-	return $configurator->report_configuration_as_string(@_);
+        return $configurator->report_configuration_as_string(@_);
 }
 
 
 # --- auto report -----------------------------------------------------------------
 sub auto_report {
-    my ($list_ref,				# what to print out
-		@all_args				# named args
-	) = @_;
+    my ($list_ref,                              # what to print out
+        @all_args                               # named args
+        ) = @_;
 
     return 0 unless defined $list_ref;
 
-	unless (ref($list_ref) eq 'ARRAY') {
-		my $type = ref($list_ref) || "no reference";
-		die "auto_report() needs ref to array as first arg but is $type";
-	}
+    unless (ref($list_ref) eq 'ARRAY') {
+        my $type = ref($list_ref) || "no reference";
+        die "auto_report() needs ref to array as first arg but is $type";
+    }
 
     return 0 unless scalar @$list_ref;
 
     my $report_framework = Report::Porf::Framework::get();
     my $configurator     = $report_framework->get_auto_configurator_action()->();
 
-	my %args = ();
-	my $file_item = '';
-	my $format    = '';
-	
-	if (scalar @all_args == 1) {
-		$file_item = $all_args[0];
+    my %args      = ();
+    my $file_item = '';
+    my $format    = '';
+    
+    if (scalar @all_args == 1) {
+        $file_item = $all_args[0];
+    }
+    else {
+	if (scalar @all_args % 2) {
+	    die "incomplete named arguments: ". join (', ', @all_args);
 	}
-	else {
-		%args = @all_args;
-		$file_item = $args{-file} if $args{-file};
-	}
+        %args      = @all_args;
+        $file_item = delete $args{-file} if exists $args{-file};
+    }
 
     my $max_rows = '';
-    $max_rows = $args{-max_rows} if defined $args{-max_rows};
-	$max_rows = '' unless defined $max_rows;
+    if (exists $args{-max_rows}) {
+	$max_rows = delete $args{-max_rows};
+    }
+    
+    if (exists $args{-format}) {
+        $format = delete $args{-format};
+    }
+    else {
+        $format = $report_framework->extract_format_of_filename($file_item);
+    }
 
-	if (defined $args{-format}) {
-		$format = $args{-format};
-	}
-	else {
-		$format = $report_framework->extract_format_of_filename($file_item);
-	}
-	
-	$format = $report_framework->get_default_format() unless $format;
+    my $columns_ref;
+    if (exists $args{-columns}) {
+	$columns_ref = delete $args{-columns};
+	my $ref_type = ref($columns_ref) || "SCALAR";
+	die "argument -columns needs ref to array but is $ref_type" unless $ref_type eq "ARRAY";
+    }
 
-    my $report = $configurator->create_report($list_ref, $report_framework, $format);
+    # print "auto_report:" . Dumper($columns_ref);
+    
+    $format = $report_framework->get_default_format() unless $format;
+
+    if (scalar %args) {
+	die "unknown arguments '" . join("', '", sort(keys(%args))) . "'";
+    }
+
+    my $report = $configurator->create_report($list_ref, $report_framework, $format, $columns_ref);
 
     # only max rows without file item set (print not too many rows to stdout)
     if (!$file_item || $max_rows) {
-		$max_rows = $report_framework->get_max_rows() if $max_rows eq '' && !$file_item;
-		if ($max_rows > 0 && scalar @$list_ref > $max_rows) {
-			$max_rows--;
-			my @rows = @{$list_ref}[0..$max_rows];
-			$list_ref = \@rows;
-		}
+        $max_rows = $report_framework->get_max_rows() if $max_rows eq '' && !$file_item;
+        if ($max_rows > 0 && scalar @$list_ref > $max_rows) {
+            $max_rows--;
+            my @rows = @{$list_ref}[0..$max_rows];
+            $list_ref = \@rows;
+        }
     }
 
     $report->write_all($list_ref, $file_item);
 
-	return scalar @$list_ref; # rows printed out
+    return scalar @$list_ref; # rows printed out
 }
 
 1;
@@ -448,7 +465,7 @@ Part of Perl Open Report Framework (Porf).
 
 =head1 VERSION
 
-This documentation refers to version 2.001 of Report::Porf::Framework
+This documentation refers to version 2.010 of Report::Porf::Framework
 
 All subs are no longer camel cased, so update your scripts, please.
 A list for conversion can be find in Report/Porf/rename_list.pl

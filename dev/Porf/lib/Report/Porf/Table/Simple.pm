@@ -5,12 +5,12 @@
 # Use Configurator or Framework of namespace Report::Porf to create Instances,
 # that export data as text, html, csv, LaTeX, for wikis and Excel
 #
-# Ralf Peine, Wed May 14 10:39:51 2014
+# Ralf Peine, Sun Dec 13 08:55:23 2020
 #
 # More documentation at the end of file
 #------------------------------------------------------------------------------
 
-$VERSION = "2.001";
+$VERSION = "2.010";
 
 #------------------------------------------------------------------------------
 #
@@ -1178,6 +1178,11 @@ sub create_action {
 
     my $sub_ref = eval ($eval_str);
 
+    if (!$sub_ref || $@) {
+        die "cannot create action with: $action_str\n"
+            ."               eval error: $@";
+    } 
+
     print "### ref(sub_ref) ".ref($sub_ref) ."\n" if verbose($self, 3);
     return $sub_ref;
 }
@@ -1193,6 +1198,16 @@ sub configure_complete {
     $action->(@_);
 
     $self->{configure_complete} = 1;
+
+    if (verbose($self, 4)) {
+        my $cell_output_actions = $self->get_cell_output_actions();
+        print "### cell_output_actions: $cell_output_actions\n";
+        print "###             count  : ".scalar (@$cell_output_actions)."\n";
+
+        foreach my $action (@$cell_output_actions) {
+            print "###   action: " . $action. "\n";
+        }
+    }
 }
 
 # --- Now all columns are defined ---------------------------
@@ -1224,7 +1239,7 @@ sub get_row_output {
 
     my $action = $self->get_row_output_action();
     die "No action to output row defined!" unless $action;
-    
+
     $action->($self, $data_ref);
 }
 
@@ -1281,6 +1296,36 @@ sub interprete_file_parameter {
     return $file_handle;
 }
 
+# --- connect all rows of the table to a string, but not the header line ---
+# ----------- better use write_table_rows for large tables ---------- 
+sub join_table_rows {
+    my ($self,           # instance_ref
+        $data_rows_ref,  # list of data_rows to give out
+        ) = @_;
+        
+    my $joined_rows = '';
+    my $row_output_action = $self->get_row_output_action();
+
+    foreach my $data (@{$data_rows_ref}) {
+        $joined_rows .= $row_output_action->($self, $data);
+    }
+    
+    return $joined_rows;
+}
+
+# --- write out all rows of the table, but not the header line ---
+sub write_table_rows {
+    my ($self,           # instance_ref
+        $data_rows_ref,  # list of data_rows to give out
+        $file_handle,    # FileHandle for output
+        ) = @_;
+        
+    my $row_output_action = $self->get_row_output_action();
+
+    foreach my $data (@{$data_rows_ref}) {
+        print $file_handle $row_output_action->($self, $data);
+    }
+}
 
 # --- Write out everything in one step ----
 sub write_all {
@@ -1293,15 +1338,10 @@ sub write_all {
 
     print $file_handle $self->get_output_start();
 
-    my $row_output_action = $self->get_row_output_action();
-
-    foreach my $data (@{$data_rows_ref}) {
-        print $file_handle $row_output_action->($self, $data);
-    }
-    
+    $self->write_table_rows($data_rows_ref, $file_handle);
+        
     print $file_handle $self->get_output_end();
 }
-
 
 1;
 

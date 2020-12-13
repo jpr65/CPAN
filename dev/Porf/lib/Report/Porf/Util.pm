@@ -4,12 +4,12 @@
 #
 # Utilities for the Perl Open Report Framework (Porf)
 #
-# Ralf Peine, Tue May 27 11:30:37 2014
+# Ralf Peine, Sun Dec 13 09:50:39 2020
 #
 # More documentation at the end of file
 #------------------------------------------------------------------------------
 
-$VERSION = "2.001";
+$VERSION = "2.010";
 
 use strict;
 use warnings;
@@ -27,10 +27,31 @@ use Carp;
 use base qw (Exporter);
 
 our @EXPORT = qw (
+max min
 print_hash_ref verbose 
 get_option_value interprete_value_options complete_value_code
 interprete_alignment const_length_left const_length_center const_length_right
 );
+
+# --- returns maximum of all given values --------------------------------------
+sub max {
+    my $max = shift;
+    foreach my $value (@_) {
+        $max = $value if $max < $value;
+    }
+
+    return $max;
+}
+
+# --- returns minimum of all given values --------------------------------------
+sub min {
+    my $min = shift;
+    foreach my $value (@_) {
+        $min = $value if $min > $value;
+    }
+
+    return $min;
+}
 
 # --- Print out hash content, flat ----------------------------------------------
 sub print_hash_ref {
@@ -87,45 +108,45 @@ sub interprete_value_options {
     push (@used_opts, "\$value_object => $value_object")       if defined $value_object;
 
     die "More than one value option used: ".join (", ", @used_opts)
-		if (scalar @used_opts > 1);
+                if (scalar @used_opts > 1);
     
     # recalc value
     my $value_result = $value_other;
 
     if (defined $value_indexed) {
-		die "Not an index for value array position: '$value_indexed'"
-			if $value_indexed =~ /\D/;
-		$value_result = '$_[0]->['.$value_indexed.']';
+                die "Not an index for value array position: '$value_indexed'"
+                        if $value_indexed =~ /\D/;
+                $value_result = '$_[0]->['.$value_indexed.']';
     }
 
     if (defined $value_named) {
-		$value_result = '$_[0]->{\''.$value_named.'\'}';
+                $value_result = '$_[0]->{\''.$value_named.'\'}';
     }
 
     if (defined $value_object) {
-		my $get_value_call = $value_object;
-		$get_value_call =~ s/\s*\(\s*\)\s*$//og;
-		$get_value_call =~ s/^\s+//og;
-		die "Not a method call for an object: '$value_object'"
-			if $get_value_call =~ /\W/;
-		$value_result = '$_[0]->'.$get_value_call.'()';
+                my $get_value_call = $value_object;
+                $get_value_call =~ s/\s*\(\s*\)\s*$//og;
+                $get_value_call =~ s/^\s+//og;
+                die "Not a method call for an object: '$value_object'"
+                        if $get_value_call =~ /\W/;
+                $value_result = '$_[0]->'.$get_value_call.'()';
     }
-	
+        
     return $value_result;
 }
 
 # --- complete value code --- add check for default value to code sequence, if $default_value defined -------
 sub complete_value_code {
-	my $value_code_str = shift;
-	my $default_value  = shift;
+        my $value_code_str = shift;
+        my $default_value  = shift;
 
-	return "return $value_code_str" unless defined $default_value;
+        return "return $value_code_str" unless defined $default_value;
 
-	$default_value =~ s/'/\\'/og;
-	
-	return "my \$value = $value_code_str;\n".
-		"\$value = '$default_value' if !defined \$value || \$value eq '';\n".
-			"return \$value;";
+        $default_value =~ s/'/\\'/og;
+        
+        return "my \$value = $value_code_str;\n".
+                "\$value = '$default_value' if !defined \$value || \$value eq '';\n".
+                        "return \$value;";
 }
 
 # --- get value for alignment --------------------------------------------------
@@ -157,8 +178,8 @@ sub interprete_alignment {
 # --- align const length left ------------
 sub const_length_left {
     my ($wanted_length,
-		$value
-	) = @_;
+                $value
+        ) = @_;
 
     my $l = length ($value);
 
@@ -175,8 +196,8 @@ sub const_length_left {
 # --- align const length center ------------
 sub const_length_center {
     my ($wanted_length,
-		$value
-	) = @_;
+                $value
+        ) = @_;
 
     my $l = length ($value);
 
@@ -196,8 +217,8 @@ sub const_length_center {
 # --- align const length right ------------
 sub const_length_right {
     my ($wanted_length,
-		$value
-	) = @_;
+                $value
+        ) = @_;
 
     my $l = length ($value);
 
@@ -213,13 +234,13 @@ sub const_length_right {
 
 # --- escape html special chars ----------------------
 sub escape_html_special_chars {
-	my ($value) = @_;
+        my ($value) = @_;
 
-	$value =~ s/&/\&amp;/og;
-	$value =~ s/</\&lt;/og;
-	$value =~ s/>/\&gt;/og;
+        $value =~ s/&/\&amp;/og;
+        $value =~ s/</\&lt;/og;
+        $value =~ s/>/\&gt;/og;
 
-	return $value;
+        return $value;
 }
 
 

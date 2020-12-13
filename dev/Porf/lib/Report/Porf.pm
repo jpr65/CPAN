@@ -6,12 +6,12 @@
 #
 # Framework to create/configure Reports for any output format.
 #
-# Ralf Peine, Tue May 27 11:30:07 2014
+# Ralf Peine, Sun Dec 13 09:50:58 2020
 #
 # More documentation at the end of file
 #------------------------------------------------------------------------------
 
-$VERSION = "2.001";
+$VERSION = "2.010";
 
 package Report::Porf;
 
@@ -52,7 +52,7 @@ Framework to create/configure Reports for any output format.
 
 =head1 VERSION
 
-This documentation refers to version 2.001 of Report::Porf
+This documentation refers to version 2.010 of Report::Porf
 
 All subs are no longer camel cased, so update your scripts, please.
 A list for conversion can be find in Report/Porf/rename_list.pl
@@ -84,8 +84,9 @@ as arrays
 
    auto_report(\@data_rows);        # prints -max_rows => 10 to STDOUT
    auto_report(\@data_rows, $file); # prints all into file
-   auto_report(\@data_rows, -file => $file, -format => 'html');
-   auto_report(\@data_rows, -file => $file, -format => 'csv', -max_rows => 13);
+   auto_report(\@data_rows, -file => $file, -columns => [qw(Prename Surname Age)]);
+   auto_report(\@data_rows, -file => $file, -format  => 'html');
+   auto_report(\@data_rows, -file => $file, -format  => 'csv', -max_rows => 13);
 
 Where
 
@@ -101,6 +102,13 @@ explicit in this case.
 C< -max_rows> defines maximum rows to print out. In case of printing
 out at STDOUT there is a default max_rows set to 10 rows. That
 makes live easy for debugging.
+
+C< -columns> has different meanings for hash rows or array rows.
+
+For hash rows it selects and orders columns.
+
+For array rows it just names columns. If a column should not be given out
+by report, just name it by '-undef').
 
 If using more than 2 args all arguments after first need to be named.
 

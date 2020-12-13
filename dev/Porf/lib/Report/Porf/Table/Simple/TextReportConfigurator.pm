@@ -6,12 +6,12 @@
 #
 # Configures a Report::Porf::Table::Simple to write out ASCII- or UTF-Text tables
 #
-# Ralf Peine, Tue May 27 11:29:41 2014
+# Ralf Peine, Sun Dec 13 08:57:37 2020
 #
 # More documentation at the end of file
 #------------------------------------------------------------------------------
 
-$VERSION = "2.001";
+$VERSION = "2.010";
 
 #------------------------------------------------------------------------------
 #

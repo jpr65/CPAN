@@ -6,12 +6,12 @@
 #
 # Configures a Report::Porf::Table::Simple to write out HTML tables
 #
-# Ralf Peine, Tue May 27 11:29:32 2014
+# Ralf Peine, Sun Dec 13 08:57:12 2020
 #
 # More documentation at the end of file
 #------------------------------------------------------------------------------
 
-$VERSION = "2.001";
+$VERSION = "2.010";
 
 #------------------------------------------------------------------------------
 #
