@@ -29,27 +29,43 @@ is (tacks, 1, "first tack");
 
 print '# ';
 
-Alive::Ticker::setup(-name => '#');
+Alive::Ticker::setup_tack(-name => '#');
 
 foreach my $i (1..2000) {
     tack;
 } _say;
 
-is (tacks, 2001, "first 2001 tacks");
+is (tacks, 2000, "first 2001 tacks");
+
+tick; _say;
+
+is (ticks, 1, "first tick");
+
+print '# ';
+
+Alive::Ticker::setup(-name => '@');
+
+foreach my $i (1..2000) {
+    tick;
+} _say;
+
+is (ticks, 2000, "first 2001 ticks");
 
 my $tick = tack;
 
 $tick->();
 
-is (tacks, 2003, "first tick");
+is (tacks, 2002, "first tick");
 
-my $tc = Alive::Ticker::get_tack_counter();
+my $tac = Alive::Ticker::get_tack_counter();
+my $tic = Alive::Ticker::get_tick_counter();
 
-is ($$tc, 2003, "get_tack_counter()");
+is ($$tac, 2002, "get_tack_counter()");
+is ($$tic, 2000, "get_tick_counter()");
 
 tack;
 
-is ($$tc, 2004, "tack_counter++");
+is ($$tac, 2003, "tack_counter++");
 
 my $tick_2_count = 0;
 
@@ -126,6 +142,28 @@ foreach my $i (1..2000000) {
 say "\n# --------------";
 
 is($tick_dyn_count, 2000000, "2 000 000 ticks");
+
+Alive::Ticker::setup_tick(
+    -name => '#',
+    -auto_regulation => 1
+    );
+
+Alive::Ticker::setup_tack(
+    -name => '#M',
+    -smaller_char => '*',
+    -bigger_char  => '&',
+    -auto_regulation => 1,
+    );
+
+foreach my $i (1..1000000) {
+    tick;
+    if ($i % 783 == 0) {
+	tack;
+    }
+} _say;
+
+is (ticks, 1000000, "ticks");
+is (tacks,    1277, "tacks");
 
 done_testing();
 

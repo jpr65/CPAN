@@ -23,7 +23,8 @@ use Time::HiRes qw(time);
 use base qw(Exporter);
 
 our @EXPORT    = qw();
-our @EXPORT_OK = qw(tack tacks get_tack_counter reset_tack_counter);
+our @EXPORT_OK = qw(tick ticks get_tick_counter reset_tick_counter
+                    tack tacks get_tack_counter reset_tack_counter);
 our %EXPORT_TAGS = (
     all => [@EXPORT_OK]
 );
@@ -132,34 +133,70 @@ sub create {
     }    
 }
 
-# --- default tick tack ----------------------------------
+# --- default tick ----------------------------------
 my $tick;
-my $counter = 0;
+my $tick_counter = 0;
+
+# --- setup default tick ----------------------------
+sub setup_tick {
+    $tick_counter = 0;
+    $tick         = create(@_, -counter_ref => \$tick_counter); 
+}
+
+sub get_tick_counter {
+    return \$tick_counter;
+}
+
+sub reset_tick_counter {
+    $tick_counter = 0;
+}
+
+sub ticks {
+    return $tick_counter;
+}
+
+# --- default tack ----------------------------------
+my $tack;
+my $tack_counter = 0;
 
 # --- setup default tick tack ----------------------------
-sub setup {
-    $tick = create(@_, -counter_ref => \$counter); 
+sub setup_tack {
+    $tack_counter = 0;
+    $tack         = create(@_, -counter_ref => \$tack_counter); 
 }
 
 sub get_tack_counter {
-    return \$counter;
+    return \$tack_counter;
 }
 
 sub reset_tack_counter {
-    $counter = 0;
+    $tack_counter = 0;
 }
 
 sub tacks {
-    return $counter;
+    return $tack_counter;
+}
+
+# === setup ticker ======================================
+
+sub setup {
+    return setup_tick(@_);
 }
 
 # === the working function ===============================
 
-# --- count and print default tick tack ------------------
-sub tack {
-    setup() unless $tick;
+# --- count and print ------------------
+sub tick {
+    setup_tick() unless $tick;
     $tick->();
     return $tick;
+}
+
+# --- count and print ------------------
+sub tack {
+    setup_tack() unless $tack;
+    $tack->();
+    return $tack;
 }
 
 1;
@@ -172,11 +209,19 @@ Alive::Ticker - to show perl is still alive and working during long time running
 
 =head1 VERSION
 
-This documentation refers to version 0.100 of Alive::Ticker
+This documentation refers to version 0.200 of Alive::Ticker
 
 =head1 SYNOPSIS
 
 Shortest
+
+  use Alive::Ticker qw(tack);
+  
+  foreach my $i (1..10000) {
+      tack;
+  }
+
+or use "tick"
 
   use Alive::Ticker qw(tack);
   
@@ -209,9 +254,31 @@ or individual
       $tick->();
   }
 
+or use both interal counters "tick" and "tack", tick for every loop and tack for every match:
+
+  Alive::Ticker::setup_tick(
+      -factor       => 100
+  );
+
+  Alive::Ticker::setup_tack(
+      -name         => '#M',
+      -smaller_char => '*',
+      -bigger_char  => '&',
+      -factor       => 1
+  );
+
+  foreach my $i (1..10000) {
+      tick;
+      if ($i % 73 == 0) {
+          tack;
+      }
+  }
+
 =head1 DESCRIPTION
 
 Alive::Ticker does inform the user that perl job or script is still running by printing to console.
+
+There are two internal tickers, "tick" and "tack".
 
 The following script
 
@@ -219,7 +286,7 @@ The following script
   use Alive::Ticker qw(:all);
   
   foreach my $i (1..2000) {
-      tack;
+      tick;
   }
 
 prints out this
@@ -242,7 +309,8 @@ that could be created.
 Alive::Ticker::create() creates a tick closure (a reference to a anonymous sub) for comfort
 and fast calling without method name search and without args. The counter is inside.
 
-Using instances is much more work to implement, slower and not so flexible.
+Using instances is much more work to implement (without any class-support like Moo),
+slower and not so flexible.
 
 =head4 Parameters
 
@@ -256,8 +324,7 @@ Using instances is much more work to implement, slower and not so flexible.
   -name            # '': prepend every new line with it
   -auto_regulation # 0 : [0.0..10.0] If > 0, regulate -factor by time to print one dot
   -counter_ref     # reference to counter that should be used
-  -action          # action will be called by every call of tack; or $tick->();
-
+  -action          # action will be called by every call of tack; tick; or $tick->();
 
 =head3 Parameter -auto_regulation
 
@@ -278,24 +345,24 @@ prints something like:
 
 =head3 setup()
 
-Setup create the default ticker tack with same arguments as in create, except that
+Setup create the default ticker tick with same arguments as in create, except that
 
   # -counter_ref => ignored
   
 will be ignored.
 
-=head3 tack or $tick->()
+=head3 tack, tick or $tick->()
 
 $tick->() prints out a '.' every 10th call (default), a ',' every 100th call (default) and
 starts a new line with number of calls done printed every 500th call (default).
 
-=head3 tacks()
+=head3 tacks() or ticks()
 
 returns the value of the counter used by tack.
 
-=head3 get_tack_counter()
+=head3 get_tack_counter() or get_tick_counter()
 
-returns a reference to the counter variable used by tack for fast access.
+returns a reference to the counter variable used by tack or tick for fast access.
 
 =head2 Running Modes
 
