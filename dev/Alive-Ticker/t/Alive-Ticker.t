@@ -1,3 +1,11 @@
+# Perl 5
+#
+# Test for Alive::Ticker
+#
+# Ralf Peine, Sun Dec 20 16:45:29 2020
+#
+#------------------------------------------------------------------------------
+
 # Before 'make install' is performed this script should be runnable with
 # 'make test'. After 'make install' it should work as 'perl Alive-Ticker.t'
 
@@ -7,6 +15,8 @@
 
 use strict;
 use warnings;
+
+use v5.10;
 
 use Test::More;
 use Alive::Ticker qw(:all);
@@ -85,6 +95,37 @@ foreach my $i (1..200) {
 } _say;
 
 is ($tick_2_count, 600, "on() printing and counting ticks");
+
+my $tick_auto = Alive::Ticker::create(-name            => 'Dyn',
+				      -auto_regulation => 0.02
+    );
+
+my $val = 3.14;
+
+foreach my $i (1..2000000) {
+    $tick_auto->();
+    $val = 0.5 + sin($val);
+}
+
+say "\n# --------------";
+
+my $tick_dyn_count = 0;
+
+$tick_auto = Alive::Ticker::create(-name            => 'Dyn*',
+				   -auto_regulation => 1,
+				   -counter_ref     => \$tick_dyn_count,
+    );
+
+$val = 3.14;
+
+foreach my $i (1..2000000) {
+    $tick_auto->();
+    $val = 0.5 + sin($val);
+}
+
+say "\n# --------------";
+
+is($tick_dyn_count, 2000000, "2 000 000 ticks");
 
 done_testing();
 

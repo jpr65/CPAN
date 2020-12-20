@@ -15,14 +15,15 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-$VERSION ='0.110';
+$VERSION ='0.200';
 
 use Perl5::Spartanic;
+use Time::HiRes qw(time);
 
 use base qw(Exporter);
 
 our @EXPORT    = qw();
-our @EXPORT_OK = qw(tack tacks get_tack_counter);
+our @EXPORT_OK = qw(tack tacks get_tack_counter reset_tack_counter);
 our %EXPORT_TAGS = (
     all => [@EXPORT_OK]
 );
@@ -55,18 +56,20 @@ sub create {
     my $trouble_level = p_start;
     my %pars          = convert_to_named_params \@_;
     
-    my $smaller      = npar -smaller      => -Default =>   1 => Int    => \%pars;
-    my $bigger       = npar -bigger       => -Default =>  10 => Int    => \%pars;
-    my $newline      = npar -newline      => -Default =>  50 => Int    => \%pars;
-    my $factor       = npar -factor       => -Default =>  10 => Int    => \%pars;
-    my $smaller_char = npar -smaller_char => -Default => '.' => Scalar => \%pars;
-    my $bigger_char  = npar -bigger_char  => -Default => ',' => Scalar => \%pars;
-    my $name         = npar -name         => -Default => ''  => Scalar => \%pars;
+    my $smaller         = npar -smaller         => -Default =>   1  => Int    => \%pars;
+    my $bigger          = npar -bigger          => -Default =>  10  => Int    => \%pars;
+    my $newline         = npar -newline         => -Default =>  50  => Int    => \%pars;
+    my $factor          = npar -factor          => -Default =>  10  => Int    => \%pars;
+    my $smaller_char    = npar -smaller_char    => -Default => '.'  => Scalar => \%pars;
+    my $bigger_char     = npar -bigger_char     => -Default => ','  => Scalar => \%pars;
+    my $name            = npar -name            => -Default => ''   => Scalar => \%pars;
     
-    my $counter      = 0;
-    my $counter_ref  = npar -counter_ref => -Default => \$counter => Ref     => \%pars;
+    my $counter         = 0;
+    my $counter_ref     = npar -counter_ref     => -Default => \$counter => Ref     => \%pars;
     
-    my $action       = npar -action      => -Optional             => CodeRef => \%pars;
+    my $action          = npar -action          => -Optional             => CodeRef => \%pars;
+    my $auto_regulation = npar -auto_regulation => -Default => 0
+                                                => -Range   => [0,10]    => Float   => \%pars;
         
     p_end \%pars;
  
@@ -81,7 +84,11 @@ sub create {
     $smaller *= $factor;
     $bigger  *= $factor;
     $newline *= $factor;
-    
+
+    my $next_tick_grenze = $newline;
+
+    my $last_counter_reconfig_time = 0;
+
     return sub {
         return if $off > 1;
         
@@ -93,6 +100,20 @@ sub create {
         }
         
         return if $off;
+
+        if ($auto_regulation && $$counter_ref > $next_tick_grenze) {
+            my $current_time_diff = 0;
+            $current_time_diff = time() - $last_counter_reconfig_time if $last_counter_reconfig_time;
+            # print "current_time_diff = $current_time_diff\n";
+
+            if ($current_time_diff < $auto_regulation) {
+                $last_counter_reconfig_time = time();
+                $smaller *= 10;
+                $bigger  *= 10;
+                $newline *= 10;
+            }
+            $next_tick_grenze *= 10;
+        }
         
         unless ($$counter_ref % $newline) {
             print "\n$name$$counter_ref ";
@@ -113,7 +134,7 @@ sub create {
 
 # --- default tick tack ----------------------------------
 my $tick;
-my $counter;
+my $counter = 0;
 
 # --- setup default tick tack ----------------------------
 sub setup {
@@ -122,6 +143,10 @@ sub setup {
 
 sub get_tack_counter {
     return \$counter;
+}
+
+sub reset_tack_counter {
+    $counter = 0;
 }
 
 sub tacks {
@@ -221,17 +246,35 @@ Using instances is much more work to implement, slower and not so flexible.
 
 =head4 Parameters
 
-  # name        # default: description
-  -smaller      #  1: print every $smaller * $factor call $smaller_char 
-  -bigger       # 10: print every $bigger  * $factor call $bigger_char 
-  -newline      # 50: print every $newline * $factor call "\n$name$$counter_ref"
-  -factor       # 10:
-  -smaller_char # '.'
-  -bigger_char  # ','
-  -name         # '': prepend every new line with it
-  -counter_ref  # reference to counter that should be used
-  -action       # action will be called by every call of tack; or $tick->();
+  # name           # default: description
+  -smaller         #  1: print every $smaller * $factor call $smaller_char 
+  -bigger          # 10: print every $bigger  * $factor call $bigger_char 
+  -newline         # 50: print every $newline * $factor call "\n$name$$counter_ref"
+  -factor          # 10:
+  -smaller_char    # '.'
+  -bigger_char     # ','
+  -name            # '': prepend every new line with it
+  -auto_regulation # 0 : [0.0..10.0] If > 0, regulate -factor by time to print one dot
+  -counter_ref     # reference to counter that should be used
+  -action          # action will be called by every call of tack; or $tick->();
 
+
+=head3 Parameter -auto_regulation
+
+  $tick_auto = Alive::Ticker::create(-name            => 'Dyn',
+                                     -auto_regulation => 1);
+
+  foreach my $i (1..2000000) {
+      $tick_auto->();
+  }
+
+prints something like:
+
+  .........,.........,.........,.........,.........
+  Dyn 500 ....,.........,.........,.........,.........
+  Dyn 5000 ....,.........,.........,.........,.........
+  Dyn 50000 ....,.........,.........,.........,.........
+  Dyn 500000 ....,.........,
 
 =head3 setup()
 
@@ -386,6 +429,3 @@ but without any warranty; without even the implied warranty of
 merchantability or fitness for a particular purpose.
 
 =cut
-
-
-
