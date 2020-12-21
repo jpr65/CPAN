@@ -5,7 +5,7 @@
 #  to show perl is still alive and working during long time runnings
 #  prints out chars every n-th call 
 #
-#  Ralf Peine, Wed May 26 18:10:35 2015
+#  Ralf Peine, Sun Dec 20 19:04:47 2020
 #
 #==============================================================================
 
@@ -86,7 +86,7 @@ sub create {
     $bigger  *= $factor;
     $newline *= $factor;
 
-    my $next_tick_grenze = $newline;
+    my $next_tick_bound = $newline;
 
     my $last_counter_reconfig_time = 0;
 
@@ -102,7 +102,7 @@ sub create {
         
         return if $off;
 
-        if ($auto_regulation && $$counter_ref > $next_tick_grenze) {
+        if ($auto_regulation && $$counter_ref > $next_tick_bound) {
             my $current_time_diff = 0;
             $current_time_diff = time() - $last_counter_reconfig_time if $last_counter_reconfig_time;
             # print "current_time_diff = $current_time_diff\n";
@@ -113,7 +113,7 @@ sub create {
                 $bigger  *= 10;
                 $newline *= 10;
             }
-            $next_tick_grenze *= 10;
+            $next_tick_bound *= 10;
         }
         
         unless ($$counter_ref % $newline) {
@@ -194,7 +194,12 @@ sub tick {
 
 # --- count and print ------------------
 sub tack {
-    setup_tack() unless $tack;
+    setup_tack(
+	-name         => '#M',
+	-smaller_char => '*',
+	-bigger_char  => '&',
+	-factor       => 1
+	) unless $tack;
     $tack->();
     return $tack;
 }
@@ -255,17 +260,6 @@ or individual
   }
 
 or use both interal counters "tick" and "tack", tick for every loop and tack for every match:
-
-  Alive::Ticker::setup_tick(
-      -factor       => 100
-  );
-
-  Alive::Ticker::setup_tack(
-      -name         => '#M',
-      -smaller_char => '*',
-      -bigger_char  => '&',
-      -factor       => 1
-  );
 
   foreach my $i (1..10000) {
       tick;

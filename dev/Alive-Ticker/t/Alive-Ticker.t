@@ -9,21 +9,17 @@
 # Before 'make install' is performed this script should be runnable with
 # 'make test'. After 'make install' it should work as 'perl Alive-Ticker.t'
 
-#########################
-
-# change 'tests => 1' to 'tests => last_test_to_print';
-
 use strict;
 use warnings;
 
 use v5.10;
 
-use Test::More;
+use Test::More tests => 13;
 use Alive::Ticker qw(:all);
 
-sub _say { print join (' ', @_) . "\n"; }
+sub _note_err { note join (' ', @_) . "\n"; }
 
-tack; _say;
+tack; _note_err;
 
 is (tacks, 1, "first tack");
 
@@ -33,11 +29,11 @@ Alive::Ticker::setup_tack(-name => '#');
 
 foreach my $i (1..2000) {
     tack;
-} _say;
+} _note_err;
 
 is (tacks, 2000, "first 2001 tacks");
 
-tick; _say;
+tick; _note_err;
 
 is (ticks, 1, "first tick");
 
@@ -47,7 +43,7 @@ Alive::Ticker::setup(-name => '@');
 
 foreach my $i (1..2000) {
     tick;
-} _say;
+} _note_err;
 
 is (ticks, 2000, "first 2001 ticks");
 
@@ -79,7 +75,7 @@ print "@ 0 ";
 foreach my $i (1..200) {
     tack;
     $tick_2->();
-} _say;
+} _note_err;
 
 is ($tick_2_count, 200, "own tick counter");
 
@@ -108,7 +104,7 @@ Alive::Ticker::on();
 foreach my $i (1..200) {
     tack;
     $tick_2->();
-} _say;
+} _note_err;
 
 is ($tick_2_count, 600, "on() printing and counting ticks");
 
@@ -121,9 +117,9 @@ my $val = 3.14;
 foreach my $i (1..2000000) {
     $tick_auto->();
     $val = 0.5 + sin($val);
-}
+} _note_err;
 
-say "\n# --------------";
+note "--------------\n";
 
 my $tick_dyn_count = 0;
 
@@ -137,39 +133,9 @@ $val = 3.14;
 foreach my $i (1..2000000) {
     $tick_auto->();
     $val = 0.5 + sin($val);
-}
+} _note_err;
 
-say "\n# --------------";
+note "--------------\n";
 
 is($tick_dyn_count, 2000000, "2 000 000 ticks");
-
-Alive::Ticker::setup_tick(
-    -name => '#',
-    -auto_regulation => 1
-    );
-
-Alive::Ticker::setup_tack(
-    -name => '#M',
-    -smaller_char => '*',
-    -bigger_char  => '&',
-    -auto_regulation => 1,
-    );
-
-foreach my $i (1..1000000) {
-    tick;
-    if ($i % 783 == 0) {
-	tack;
-    }
-} _say;
-
-is (ticks, 1000000, "ticks");
-is (tacks,    1277, "tacks");
-
-done_testing();
-
-
-#########################
-
-# Insert your test code below, the Test::More module is use()ed here so read
-# its man page ( perldoc Test::More ) for help writing this test script.
 
