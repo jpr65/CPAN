@@ -151,6 +151,11 @@ sub reset_tick_counter {
     $tick_counter = 0;
 }
 
+sub reset_tick {
+    reset_tick_counter();
+    $tick = undef;
+}
+
 sub ticks {
     return $tick_counter;
 }
@@ -173,14 +178,24 @@ sub reset_tack_counter {
     $tack_counter = 0;
 }
 
+sub reset_tack {
+    reset_tack_counter();
+    $tack = undef;
+}
+
 sub tacks {
     return $tack_counter;
 }
 
-# === setup ticker ======================================
+# === setup ======================================
 
 sub setup {
     return setup_tick(@_);
+}
+
+sub reset {
+    reset_tick();
+    reset_tack();
 }
 
 # === the working function ===============================
