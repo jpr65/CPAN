@@ -20,6 +20,8 @@ $VERSION ='0.200';
 use Perl5::Spartanic;
 use Time::HiRes qw(time);
 
+use Scalar::Validation qw(:all);
+
 use base qw(Exporter);
 
 our @EXPORT    = qw();
@@ -28,8 +30,6 @@ our @EXPORT_OK = qw(tick ticks get_tick_counter reset_tick_counter
 our %EXPORT_TAGS = (
     all => [@EXPORT_OK]
 );
-
-use Scalar::Validation qw(:all);
 
 # === run state ==========================================
 
